@@ -14,11 +14,11 @@ mysql = MySQL(app)
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    username = data['username']
-    password = data['password']
+    username = data['nombre']
+    password = data['contrasenia']
 
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+    cur.execute("SELECT * FROM users WHERE nombre = %s", (username,))
     user = cur.fetchone()
     cur.close()
     if user:
@@ -31,17 +31,20 @@ def login():
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    username = data['username']
-    password = data['password']
+    username = data['nombre']
+    lastname = data['apellido']
+    password = data['contrasenia']
+    age = data['edad']
+
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+    cur.execute("SELECT * FROM users WHERE nombre = %s", (username,))
     user = cur.fetchone()
     if user:
         cur.close()
         return jsonify({'message': 'El usuario ya existe'}), 409  # 409 Conflict
     else:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+        cur.execute("INSERT INTO users (nombre, apellido,contrasenia,edad) VALUES (%s, %s,%s,%s)", (username,lastname, hashed_password, age))
         mysql.connection.commit()
         cur.close()
         return jsonify({'message': 'Usuario registrado exitosamente'}), 201  # 201 Created
