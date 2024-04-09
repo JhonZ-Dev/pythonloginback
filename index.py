@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
+from flask_cors import CORS
 import bcrypt
 
 app = Flask(__name__)
+CORS(app)  # Habilita CORS en todas las rutas de la aplicación
 
 # Configuración de la base de datos
 app.config['MYSQL_HOST'] = 'localhost'
@@ -28,6 +30,7 @@ def login():
             return jsonify({'message': 'Credenciales incorrectas'}), 401
     else:
         return jsonify({'message': 'Usuario no encontrado'}), 404
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -48,5 +51,6 @@ def register():
         mysql.connection.commit()
         cur.close()
         return jsonify({'message': 'Usuario registrado exitosamente'}), 201  # 201 Created
+
 if __name__ == '__main__':
     app.run(debug=True)
